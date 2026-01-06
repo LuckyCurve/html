@@ -14,8 +14,11 @@
 
 ### 本地开发
 ```bash
-# 启动本地服务器（推荐使用 Python 3）
-python -m http.server 8000
+# 快速预览（推荐，Windows环境）
+start *.html  # 在浏览器中直接打开HTML文件，无需服务器
+
+# 或启动本地服务器（推荐使用 Python 3）
+uv run python -m http.server 8000
 
 # 或使用 Node.js serve
 npx serve .
@@ -27,12 +30,18 @@ php -S localhost:8000
 ### 验证和测试
 ```bash
 # HTML 验证
+npx html-validator index.html
+npx html-validator qr-code-generator.html
 npx html-validator time-series-viewer.html
 
 # CSS 验证
+npx css-validator index.html
+npx css-validator qr-code-generator.html
 npx css-validator time-series-viewer.html
 
 # JavaScript 语法检查
+npx eslint index.html
+npx eslint qr-code-generator.html
 npx eslint time-series-viewer.html
 
 # 检查控制台错误（手动）
@@ -91,16 +100,16 @@ npx eslint time-series-viewer.html
 ### JavaScript变量
 ```javascript
 // 常量
-const STORAGE_KEY = 'timeSeriesData';
+const STORAGE_KEY = 'qrGeneratorHistory'; // 或 'latestQRCode'
 const MAX_VALUES = 100;
 
 // 变量
-let chartInstance = null;
-let currentData = [];
+let qrCode = null;
+let currentQRData = null;
 
 // 函数
-function renderChart() { }
-function handleButtonClick() { }
+function generateQR() { }
+function setTemplate(type) { }
 
 // 事件处理
 function onInputChange(event) { }

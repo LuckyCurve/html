@@ -12,6 +12,18 @@
 
 ## 📦 工具列表
 
+### 📱 二维码生成器
+- **文件**：`qr-code-generator.html`
+- **功能**：生成自定义二维码，支持多种格式和配置选项
+- **特性**：
+  - 支持URL链接、纯文本、WiFi网络等格式
+  - 可自定义二维码大小（128px-512px）
+  - 支持多种容错级别（L/M/Q/H）
+  - 6种颜色预设方案
+  - 实时容量检查和字符计数
+  - PNG图片下载和Base64复制
+  - 本地记录保存和恢复
+
 ### 📈 月度时间序列可视化
 - **文件**：`time-series-viewer.html`
 - **功能**：月度数据的时间序列可视化分析工具
@@ -60,6 +72,8 @@ php -S localhost:8000
 html/
 ├── README.md                    # 项目文档
 ├── AGENTS.md                    # 开发指南
+├── index.html                   # 工具库主页
+├── qr-code-generator.html       # 二维码生成器
 ├── time-series-viewer.html      # 时间序列可视化工具
 └── tools/                       # 更多工具（待添加）
     ├── tool-name.html
