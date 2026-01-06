@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 小工具库</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: #222;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .tool-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 24px;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .tool-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #4a90d9;
+        }
+        .tool-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .tool-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #222;
+        }
+        .tool-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #4a90d9;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .tool-link:hover {
+            background: #3a7fc8;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #4a90d9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .tool-card {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🛠️ HTML 小工具库</h1>
+        <p>轻量级工具集合，无需安装即可使用</p>
+    </header>
+
+    <main>
+        <div class="tools-grid" id="toolsGrid">
+            <!-- 工具卡片将在这里动态生成 -->
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>
+            <a href="https://github.com/anomalyco/opencode" target="_blank">开源项目</a> |
+            <a href="https://opencode.ai" target="_blank">OpenCode</a>
+        </p>
+    </footer>
+
+    <script>
+        // 工具配置数据
+        const tools = [
+            {
+                id: 'time-series-viewer',
+                icon: '📈',
+                title: '月度时间序列可视化',
+                description: '月度数据的时间序列可视化分析工具，支持趋势图表和数据管理',
+                url: 'time-series-viewer.html',
+                addedDate: '2024-01-01' // 用于排序
+            }
+            // 在这里添加更多工具...
+        ];
+
+        // 渲染工具卡片
+        function renderTools() {
+            const grid = document.getElementById('toolsGrid');
+
+            // 按添加时间排序（最新的在前）
+            const sortedTools = tools.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
+
+            const html = sortedTools.map(tool => `
+                <a href="${tool.url}" class="tool-card" title="打开 ${tool.title}">
+                    <span class="tool-icon">${tool.icon}</span>
+                    <h3 class="tool-title">${tool.title}</h3>
+                    <p class="tool-description">${tool.description}</p>
+                    <span class="tool-link">
+                        立即使用 →
+                    </span>
+                </a>
+            `).join('');
+
+            grid.innerHTML = html;
+        }
+
+        // 初始化
+        function init() {
+            renderTools();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
