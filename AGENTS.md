@@ -32,16 +32,19 @@ php -S localhost:8000
 # HTML 验证
 npx html-validator index.html
 npx html-validator qr-code-generator.html
+npx html-validator password-generator.html
 npx html-validator time-series-viewer.html
 
 # CSS 验证
 npx css-validator index.html
 npx css-validator qr-code-generator.html
+npx css-validator password-generator.html
 npx css-validator time-series-viewer.html
 
 # JavaScript 语法检查
 npx eslint index.html
 npx eslint qr-code-generator.html
+npx eslint password-generator.html
 npx eslint time-series-viewer.html
 
 # 检查控制台错误（手动）
