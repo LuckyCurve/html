@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年化收益率计算器</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: #222;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .input-section__form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .input-section__group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .input-section__label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+        .input-section__input,
+        .input-section__select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 18px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f8f8;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #eee;
+        }
+        button.primary {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+        button.primary:hover {
+            background: #3a7fc8;
+        }
+        button.danger {
+            color: #d9534f;
+            border-color: #d9534f;
+        }
+        button.danger:hover {
+            background: #d9534f;
+            color: #fff;
+        }
+        .result-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .result-section__title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .result-section__value {
+            font-size: 36px;
+            font-weight: 600;
+        }
+        .result-section__value--positive {
+            color: #5cb85c;
+        }
+        .result-section__value--negative {
+            color: #d9534f;
+        }
+        .chart-section {
+            margin-bottom: 20px;
+        }
+        #chart {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f8f8;
+            font-weight: 500;
+        }
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+        tr:hover {
+            background: #f0f0f0;
+        }
+        .positive {
+            color: #5cb85c;
+            font-weight: 600;
+        }
+        .negative {
+            color: #d9534f;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .hidden {
+            display: none;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .history-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .delete-btn {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .sort-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .sort-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .sort-btn.active {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .input-section__form {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .actions button {
+                width: 100%;
+            }
+            #chart {
+                height: 300px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+            .result-section__value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <a href="index.html" style="text-decoration: none; color: inherit; font-size: 16px; display: flex; align-items: center; gap: 4px; color: #4a90d9;">
+            ← 返回首页
+        </a>
+    </div>
+    <h1>💰 年化收益率计算器</h1>
+
+    <div id="alertContainer"></div>
+
+    <div class="input-section">
+        <div class="input-section__form">
+            <div class="input-section__group">
+                <label class="input-section__label">基金名称</label>
+                <input type="text" id="fundName" class="input-section__input" placeholder="输入基金名称（可选）">
+            </div>
+            <div class="input-section__group">
+                <label class="input-section__label">时间周期</label>
+                <select id="period" class="input-section__select">
+                    <option value="month">月度</option>
+                    <option value="quarter">季度</option>
+                    <option value="halfYear">半年</option>
+                    <option value="year">一年</option>
+                </select>
+            </div>
+            <div class="input-section__group">
+                <label class="input-section__label">初期金额（元）</label>
+                <input type="number" id="startValue" class="input-section__input" placeholder="输入初期金额" step="any" min="0">
+            </div>
+            <div class="input-section__group">
+                <label class="input-section__label">末期金额（元）</label>
+                <input type="number" id="endValue" class="input-section__input" placeholder="输入末期金额" step="any" min="0">
+            </div>
+        </div>
+        <div class="actions">
+            <button class="primary" onclick="calculateAndAdd()">计算并添加</button>
+            <button onclick="clearInputs()">清空输入</button>
+        </div>
+    </div>
+
+    <div id="resultSection" class="result-section hidden">
+        <div class="result-section__title">年化收益率</div>
+        <div id="resultValue" class="result-section__value"></div>
+    </div>
+
+    <div class="chart-section">
+        <div id="chart"></div>
+    </div>
+
+    <div class="history-header">
+        <div class="history-title">历史记录</div>
+        <button class="danger" onclick="clearAllRecords()">清空全部</button>
+    </div>
+
+    <div class="sort-controls">
+        <span class="sort-label">排序方式：</span>
+        <button class="sort-btn" onclick="sortRecords('time')" id="sortByTime">按时间</button>
+        <button class="sort-btn" onclick="sortRecords('return')" id="sortByReturn">按收益率</button>
+    </div>
+
+    <table id="recordsTable">
+        <thead>
+            <tr>
+                <th>基金名称</th>
+                <th>周期</th>
+                <th>初期金额</th>
+                <th>末期金额</th>
+                <th>期间收益率</th>
+                <th>年化收益率</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="recordsBody">
+        </tbody>
+    </table>
+    <div id="emptyState" class="empty-state">暂无历史记录，请添加第一条计算</div>
+
+    <script>
+        const STORAGE_KEY = 'annualReturnRecords';
+        let chart = null;
+        let records = [];
+        let currentSort = 'time';
+
+        function init() {
+            loadRecords();
+            chart = echarts.init(document.getElementById('chart'));
+            window.addEventListener('resize', () => chart.resize());
+
+            render();
+        }
+
+        function loadRecords() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    records = JSON.parse(stored);
+                } catch (e) {
+                    records = [];
+                }
+            }
+        }
+
+        function saveRecords() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        function calculateAnnualReturn(startValue, endValue, period) {
+            if (startValue <= 0) {
+                throw new Error('初期金额必须大于0');
+            }
+            const ratio = endValue / startValue;
+            const exponents = {
+                'month': 12,
+                'quarter': 4,
+                'halfYear': 2,
+                'year': 1
+            };
+            return Math.pow(ratio, exponents[period]) - 1;
+        }
+
+        function calculatePeriodReturn(startValue, endValue) {
+            return (endValue - startValue) / startValue;
+        }
+
+        function formatPercentage(value) {
+            const percentage = (value * 100).toFixed(6);
+            return percentage + '%';
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('zh-CN', {
+                minimumFractionDigits: 6,
+                maximumFractionDigits: 6
+            });
+        }
+
+        function formatPrecision(value, decimals = 6) {
+            return value.toFixed(decimals);
+        }
+
+        function getPeriodLabel(period) {
+            const labels = {
+                'month': '月度',
+                'quarter': '季度',
+                'halfYear': '半年',
+                'year': '一年'
+            };
+            return labels[period];
+        }
+
+        function calculateAndAdd() {
+            const fundName = document.getElementById('fundName').value.trim() || '未命名基金';
+            const period = document.getElementById('period').value;
+            const startValue = parseFloat(document.getElementById('startValue').value);
+            const endValue = parseFloat(document.getElementById('endValue').value);
+
+            if (isNaN(startValue) || isNaN(endValue)) {
+                showAlert('请输入有效的金额数值', 'error');
+                return;
+            }
+
+            if (startValue <= 0) {
+                showAlert('初期金额必须大于0', 'error');
+                return;
+            }
+
+            try {
+                const annualReturn = calculateAnnualReturn(startValue, endValue, period);
+                const periodReturn = calculatePeriodReturn(startValue, endValue);
+
+                const record = {
+                    id: Date.now(),
+                    fundName: fundName,
+                    period: period,
+                    startValue: startValue,
+                    endValue: endValue,
+                    periodReturn: periodReturn,
+                    annualReturn: annualReturn,
+                    createdAt: new Date().toISOString()
+                };
+
+                records.push(record);
+                saveRecords();
+                render();
+                clearInputs();
+                showAlert('计算成功！已添加到历史记录', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('fundName').value = '';
+            document.getElementById('startValue').value = '';
+            document.getElementById('endValue').value = '';
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('确定删除这条记录吗？')) {
+                records = records.filter(r => r.id !== id);
+                saveRecords();
+                render();
+                showAlert('记录已删除', 'info');
+            }
+        }
+
+        function clearAllRecords() {
+            if (records.length === 0) {
+                showAlert('没有记录可清空', 'info');
+                return;
+            }
+            if (confirm('确定要清空所有历史记录吗？此操作不可恢复。')) {
+                records = [];
+                saveRecords();
+                render();
+                showAlert('所有记录已清空', 'info');
+            }
+        }
+
+        function sortRecords(sortBy) {
+            currentSort = sortBy;
+
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (sortBy === 'time') {
+                document.getElementById('sortByTime').classList.add('active');
+                records.sort((a, b) => b.id - a.id);
+            } else if (sortBy === 'return') {
+                document.getElementById('sortByReturn').classList.add('active');
+                records.sort((a, b) => b.annualReturn - a.annualReturn);
+            }
+
+            saveRecords();
+            render();
+        }
+
+        function render() {
+            renderTable();
+            renderChart();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('recordsBody');
+            const emptyState = document.getElementById('emptyState');
+            const table = document.getElementById('recordsTable');
+
+            if (records.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                table.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            table.classList.remove('hidden');
+
+            tbody.innerHTML = records.map(record => {
+                const periodReturnClass = record.periodReturn >= 0 ? 'positive' : 'negative';
+                const annualReturnClass = record.annualReturn >= 0 ? 'positive' : 'negative';
+                const periodReturnPrefix = record.periodReturn >= 0 ? '+' : '';
+                const annualReturnPrefix = record.annualReturn >= 0 ? '+' : '';
+
+                return `
+                    <tr>
+                        <td>${record.fundName}</td>
+                        <td>${getPeriodLabel(record.period)}</td>
+                        <td>${formatCurrency(record.startValue)}</td>
+                        <td>${formatCurrency(record.endValue)}</td>
+                        <td class="${periodReturnClass}">${periodReturnPrefix}${formatPercentage(record.periodReturn)}</td>
+                        <td class="${annualReturnClass}">${annualReturnPrefix}${formatPercentage(record.annualReturn)}</td>
+                        <td><button class="delete-btn danger" onclick="deleteRecord(${record.id})">删除</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderChart() {
+            if (records.length === 0) {
+                chart.clear();
+                return;
+            }
+
+            const fundNames = records.map(r => r.fundName);
+            const annualReturns = records.map(r => (r.annualReturn * 100).toFixed(2));
+            const colors = records.map(r => r.annualReturn >= 0 ? '#5cb85c' : '#d9534f');
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const index = params[0].dataIndex;
+                        const record = records[index];
+                        return `
+                            ${record.fundName}<br/>
+                            周期：${getPeriodLabel(record.period)}<br/>
+                            期间收益率：${formatPercentage(record.periodReturn)}<br/>
+                            年化收益率：${formatPercentage(record.annualReturn)}<br/>
+                            期间倍数：${formatPrecision(record.periodReturn + 1, 6)}<br/>
+                            年化倍数：${formatPrecision(record.annualReturn + 1, 6)}
+                        `;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: 10,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: fundNames,
+                    axisLabel: {
+                        rotate: records.length > 6 ? 45 : 0,
+                        fontSize: 12
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [
+                    {
+                        name: '年化收益率',
+                        type: 'bar',
+                        data: annualReturns,
+                        itemStyle: {
+                            color: function(params) {
+                                return colors[params.dataIndex];
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: function(params) {
+                                const value = parseFloat(params.value);
+                                return (value >= 0 ? '+' : '') + formatPrecision(value, 6) + '%';
+                            }
+                        }
+                    }
+                ]
+            };
+
+            chart.setOption(option, true);
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
