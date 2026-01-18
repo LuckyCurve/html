@@ -50,7 +50,8 @@
             transition: box-shadow 0.2s, border-color 0.2s;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .tool-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -72,8 +73,10 @@
             color: #666;
             margin-bottom: 20px;
             line-height: 1.5;
+            flex: 1;
         }
         .tool-link {
+            align-self: flex-start;
             display: inline-flex;
             align-items: center;
             gap: 8px;
